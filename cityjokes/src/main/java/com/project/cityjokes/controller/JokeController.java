@@ -6,14 +6,14 @@
 package com.project.cityjokes.controller;
 
 import com.project.cityjokes.model.Joke;
-//import com.project.cityjokes.schedule.JokesSchedule;
 import com.project.cityjokes.service.JokeService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -37,6 +36,8 @@ public class JokeController {
 
     @Autowired
     JokeService jokeService;
+    @Autowired
+    JokesIntoExcel jokesIntoExcel;
 
     @GetMapping(path = "/findAll/jokes", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Joke> findAll() {
@@ -78,4 +79,24 @@ public class JokeController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Didn't find appropriate jokes with advancedSearch");
     }
 
+    @GetMapping(value = "/downloadExcelFile")
+    public ResponseEntity download(@RequestParam(name = "category", required = false) String[] categories,
+            @RequestParam(name = "key") String input) {
+
+        List<Joke> jokes = new ArrayList<>();
+        String name = "joke.xlsx";
+
+        if (categories == null) {
+            jokes = jokeService.search(input);
+        } else {
+            jokes = jokeService.advancedSearch(categories, input);
+        }
+        byte[] bytes = jokesIntoExcel.buildExcelDocument(jokes);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "force-download"));
+        header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + name + "\"");
+        return new ResponseEntity<>(new ByteArrayResource(bytes), header, HttpStatus.CREATED);
+
+    }
 }

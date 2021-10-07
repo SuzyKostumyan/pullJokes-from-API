@@ -9,7 +9,6 @@ import com.project.cityjokes.model.Joke;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -21,7 +20,6 @@ public interface JokeRepository extends MongoRepository<Joke, String> {
 
     List<Joke> findByIdContainingOrValueContaining(String id, String value);
 
-    List<Joke> findByCategoriesAndValueContaining(String[] category, String id, String value);
-        
+    List<Joke> findByCategoriesAndValueContainingOrIdContaining(String[] category, String id, String value);
+
 }
- 

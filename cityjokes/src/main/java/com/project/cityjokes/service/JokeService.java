@@ -6,7 +6,6 @@
 package com.project.cityjokes.service;
 
 import com.google.gson.Gson;
-//import com.project.cityjokes.dto.JokeDTO;
 import com.project.cityjokes.model.Joke;
 import com.project.cityjokes.repository.JokeRepository;
 import java.io.BufferedReader;
@@ -15,19 +14,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.json.JSONArray;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 /**
  *
@@ -48,7 +41,7 @@ public class JokeService {
 
     @Transactional
     public List<Joke> advancedSearch(String[] category, String input) {
-        List<Joke> foundJoke = jokeRepository.findByCategoriesAndValueContaining(category, input, input);
+        List<Joke> foundJoke = jokeRepository.findByCategoriesAndValueContainingOrIdContaining(category, input, input);
         return foundJoke;
     }
 
